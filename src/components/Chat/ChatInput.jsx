@@ -287,7 +287,7 @@ const ChatInput = ({ room, editingMessage, setEditingMessage }) => {
             value={text}
             onChange={handleTyping}
             onKeyDown={handleKeyDown}
-            className="input-field py-2.5 text-sm resize-none max-h-32 min-h-[44px] break-all"
+            className="input-field py-2.5 text-sm resize-none max-h-32 min-h-[44px] break-all no-scrollbar"
             placeholder="Type a message..."
             rows={1}
             id="message-input"
