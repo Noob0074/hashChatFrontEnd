@@ -294,47 +294,20 @@ const ChatInput = ({ room, editingMessage, setEditingMessage }) => {
           />
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {editingMessage && (
-            <button
-              onClick={handleSend}
-              disabled={uploading || !text.trim()}
-              className="p-2.5 rounded-xl bg-primary-600 text-white hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20 disabled:opacity-40"
-              title="Save changes"
-            >
-              {uploading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Save className="w-5 h-5" />
-              )}
-            </button>
+        {/* Send button */}
+        <button
+          onClick={handleSend}
+          disabled={(!text.trim() && !file) || uploading}
+          className="p-2.5 rounded-xl bg-primary-600 text-white hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20 disabled:opacity-40 flex-shrink-0"
+          id="send-btn"
+          title={editingMessage ? "Save changes" : "Send message"}
+        >
+          {uploading ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <Send className="w-5 h-5" />
           )}
-
-          <button
-            onClick={(e) => {
-              if (editingMessage) {
-                setEditingMessage(null);
-                // We want to send as new, so we clear edit mode and call handleSend (which will now send as new)
-                // However, handleSend is async and uses the 'text' state.
-                // Since state updates are async, we might need a small workaround or just call the logic directly.
-                setTimeout(() => handleSend(e), 0);
-              } else {
-                handleSend(e);
-              }
-            }}
-            disabled={(!text.trim() && !file) || uploading}
-            className="p-2.5 rounded-xl bg-primary-600 text-white hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20 disabled:opacity-40"
-            id="send-btn"
-            title="Send message"
-          >
-            {uploading && !editingMessage ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
-        </div>
+        </button>
       </div>
     </div>
   )
