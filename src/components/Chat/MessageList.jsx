@@ -16,7 +16,7 @@ const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, on
    }, [messages.length])
  
    return (
-     <div ref={containerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+     <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-1">
        {/* Load more */}
        {hasMore && (
          <div className="text-center py-2">

@@ -152,7 +152,7 @@ const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRoo
   const isAdmin = (room?.createdBy?._id || room?.createdBy) === user?._id
 
   return (
-    <div className="h-full flex flex-col bg-dark-950">
+    <div className="h-full flex flex-col bg-dark-950 overflow-hidden">
       <ChatHeader
         room={room}
         isAdmin={isAdmin}
@@ -162,9 +162,9 @@ const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRoo
         onRoomDeleted={onRoomDeleted}
       />
 
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <MessageList
             messages={messages}
             loading={loading}

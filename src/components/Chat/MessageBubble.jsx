@@ -88,7 +88,7 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
           ) : (
             <>
               {message.type === 'text' && (
-                <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                <p className="text-sm leading-relaxed break-all break-words whitespace-pre-wrap">
                   {message.content}
                 </p>
               )}
