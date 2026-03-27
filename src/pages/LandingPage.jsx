@@ -21,7 +21,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="flex-1 w-full min-h-[100dvh] bg-dark-950 flex flex-col items-center justify-center p-6 relative">
       {/* Background orbs */}
       <div className="orb w-96 h-96 bg-primary-600 top-[-10%] left-[-10%] animate-pulse" />
       <div className="orb w-96 h-96 bg-purple-500 bottom-[-10%] right-[-10%] animate-pulse" style={{ animationDelay: '2.5s' }} />

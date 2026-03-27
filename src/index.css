@@ -14,7 +14,6 @@
 
   body {
     @apply bg-dark-950 text-dark-100 font-sans antialiased;
-    overflow: hidden;
   }
 
   ::-webkit-scrollbar {

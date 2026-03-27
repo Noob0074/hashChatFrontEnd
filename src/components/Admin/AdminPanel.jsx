@@ -174,7 +174,7 @@ const AdminPanel = ({ room, onClose, onRefresh, isAdmin }) => {
   }
 
   return (
-    <div className="w-80 border-l border-dark-700/50 bg-dark-900 flex flex-col h-full flex-shrink-0 animate-fade-in">
+    <div className="absolute inset-0 z-40 md:relative w-full md:w-80 border-l border-dark-700/50 bg-dark-900 flex flex-col h-full flex-shrink-0 animate-fade-in">
       <div className="p-4 border-b border-dark-700/50 flex items-center justify-between">
         <h3 className="font-semibold text-white flex items-center gap-2">
           {isAdmin ? (

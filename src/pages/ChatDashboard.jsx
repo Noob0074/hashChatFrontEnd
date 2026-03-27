@@ -154,7 +154,7 @@ const ChatDashboard = () => {
   }
 
   return (
-    <div className="h-screen w-screen flex bg-dark-950">
+    <div className="flex-1 h-[100dvh] max-h-[100dvh] w-full flex bg-dark-950 overflow-hidden relative">
       {/* Sidebar */}
       <div
         className={`
