@@ -21,7 +21,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="flex-1 w-full min-h-[100dvh] bg-dark-950 flex flex-col items-center justify-center p-6 relative">
+    <div className="flex-1 w-full h-full overflow-y-auto bg-dark-950 flex flex-col items-center pt-12 md:pt-0 md:justify-center p-6 relative scroll-smooth">
       {/* Background orbs */}
       <div className="orb w-96 h-96 bg-primary-600 top-[-10%] left-[-10%] animate-pulse" />
       <div className="orb w-96 h-96 bg-purple-500 bottom-[-10%] right-[-10%] animate-pulse" style={{ animationDelay: '2.5s' }} />
@@ -74,7 +74,7 @@ const LandingPage = () => {
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 mb-16 animate-fade-in" style={{ animationDelay: '0.6s' }}>
           <FeatureCard 
             icon={<Shield className="w-6 h-6 text-emerald-400" />}
             title="Privacy First"
@@ -93,7 +93,7 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <footer className="absolute bottom-8 text-dark-500 text-sm">
+      <footer className="mt-auto py-8 text-dark-500 text-sm relative z-10 w-full text-center">
         &copy; 2026 Hashchat. All rights reserved.
       </footer>
     </div>
