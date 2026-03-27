@@ -152,7 +152,7 @@ const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRoo
   const isAdmin = (room?.createdBy?._id || room?.createdBy) === user?._id
 
   return (
-    <div className="h-full flex flex-col bg-dark-950 overflow-hidden">
+    <div className="h-full flex flex-col bg-dark-950 overflow-hidden pt-[env(safe-area-inset-top)]">
       <ChatHeader
         room={room}
         isAdmin={isAdmin}

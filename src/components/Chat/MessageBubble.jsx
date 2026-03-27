@@ -34,23 +34,45 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
   const showActionsButton = (isMine || isAdmin) && !isDeleted;
 
   const renderActionsMenu = () => (
-    <div className={`absolute top-full ${isMine ? 'right-0' : 'left-0'} mt-1 w-32 bg-dark-800 border border-dark-700 rounded-xl shadow-2xl z-20 overflow-hidden animate-fade-in ring-1 ring-white/5`}>
-      {isMine && !isDeleted && message.type === 'text' && (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer" 
+        onClick={() => setShowActions(false)} 
+      />
+      
+      {/* Menu Content */}
+      <div className="relative w-full max-w-[200px] bg-dark-800 border border-dark-700/50 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-white/10 animate-scale-in">
+        <div className="px-4 py-3 border-b border-dark-700/50 bg-dark-900/50">
+          <p className="text-[10px] uppercase font-bold text-dark-400 tracking-widest text-center">Message Actions</p>
+        </div>
+        
+        <div className="p-1">
+          {isMine && !isDeleted && message.type === 'text' && (
+            <button 
+              onClick={() => { onEdit(); setShowActions(false); }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-dark-100 hover:bg-primary-500/10 hover:text-primary-400 rounded-xl transition-all"
+            >
+              <Pencil className="w-4 h-4" />
+              <span className="font-medium">Edit Message</span>
+            </button>
+          )}
+          <button 
+            onClick={() => { setShowDeleteConfirm(true); setShowActions(false); }}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="font-medium text-red-400">Delete Message</span>
+          </button>
+        </div>
+        
         <button 
-          onClick={() => { onEdit(); setShowActions(false); }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-dark-200 hover:bg-dark-700 transition-colors"
+          onClick={() => setShowActions(false)}
+          className="w-full py-3 text-xs font-bold text-dark-500 hover:text-dark-200 bg-dark-800/50 border-t border-dark-700/50 uppercase tracking-widest transition-colors"
         >
-          <Pencil className="w-3 h-3 text-primary-500" />
-          Edit
+          Cancel
         </button>
-      )}
-      <button 
-        onClick={() => { setShowDeleteConfirm(true); setShowActions(false); }}
-        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-500/10 transition-colors"
-      >
-        <Trash2 className="w-3 h-3" />
-        Delete
-      </button>
+      </div>
     </div>
   )
 

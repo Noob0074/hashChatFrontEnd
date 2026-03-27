@@ -160,7 +160,7 @@ const ChatDashboard = () => {
         className={`
           ${sidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'}
           transition-all duration-300 ease-in-out
-          fixed md:relative z-30 h-full flex-shrink-0 overflow-hidden border-r border-dark-700/50
+          fixed md:relative z-30 h-full flex-shrink-0 overflow-hidden border-r border-dark-700/50 pt-[env(safe-area-inset-top)]
         `}
       >
         <Sidebar
