@@ -21,14 +21,14 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="flex-1 w-full h-full overflow-y-auto bg-dark-950 flex flex-col items-center pt-12 md:pt-0 md:justify-center p-6 relative scroll-smooth">
+    <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden bg-dark-950 flex flex-col items-center pt-12 md:pt-0 md:justify-center p-6 relative scroll-smooth">
       {/* Background orbs */}
       <div className="orb w-96 h-96 bg-primary-600 top-[-10%] left-[-10%] animate-pulse" />
       <div className="orb w-96 h-96 bg-purple-500 bottom-[-10%] right-[-10%] animate-pulse" style={{ animationDelay: '2.5s' }} />
 
       <div className="relative z-10 w-full max-w-4xl text-center">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8 animate-fade-in">
+        <div className="w-full flex items-center justify-center gap-3 mb-8 animate-fade-in">
           <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30">
             <Hash className="w-10 h-10 text-white" />
           </div>
@@ -39,7 +39,7 @@ const LandingPage = () => {
           Anonymous Real-time Messaging
         </h2>
         
-        <p className="text-dark-400 text-lg mb-10 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-dark-400 text-lg mb-10 max-w-xs sm:max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
           Secure, private, and instant chat rooms. No personal information required.
           Start a conversation in seconds.
         </p>
