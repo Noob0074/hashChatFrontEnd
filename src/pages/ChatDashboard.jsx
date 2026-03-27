@@ -154,13 +154,13 @@ const ChatDashboard = () => {
   }
 
   return (
-    <div className="flex-1 h-[100dvh] max-h-[100dvh] w-full flex bg-dark-950 overflow-hidden relative">
+    <div className="flex-1 h-full w-full flex bg-dark-950 overflow-hidden relative">
       {/* Sidebar */}
       <div
         className={`
-          ${sidebarOpen ? 'w-80 lg:w-96 translate-x-0' : 'w-0 -translate-x-full'}
+          ${sidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'}
           transition-all duration-300 ease-in-out
-          fixed md:relative z-30 h-full flex-shrink-0 overflow-hidden
+          fixed md:relative z-30 h-full flex-shrink-0 overflow-hidden border-r border-dark-700/50
         `}
       >
         <Sidebar

@@ -20,7 +20,7 @@ function App() {
   }
 
   return (
-    <div className="w-full min-h-[100dvh] flex flex-col bg-dark-950 text-white">
+    <div className="h-screen h-[100dvh] w-full flex flex-col bg-dark-950 text-white overflow-hidden">
       <Routes>
         <Route
           path="/"
