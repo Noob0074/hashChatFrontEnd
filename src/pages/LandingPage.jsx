@@ -28,7 +28,7 @@ const LandingPage = () => {
 
       <div className="relative z-10 w-full max-w-4xl text-center">
         {/* Logo */}
-        <div className="w-full flex items-center justify-center gap-3 mb-8 animate-fade-in">
+        <div className="w-full flex items-center justify-center gap-3 mb-8 animate-fade-in relative -left-2 sm:left-0">
           <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30">
             <Hash className="w-10 h-10 text-white" />
           </div>

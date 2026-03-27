@@ -52,7 +52,7 @@ const AdminSettings = ({ room, onUpdate }) => {
         body: formData,
       })
       const result = await response.json()
-      return result.secure_url
+      return { url: result.secure_url, publicId: result.public_id }
     } catch (err) {
       toast.error('Cloudinary API not configured. Photo not saved.')
       return null
@@ -72,13 +72,17 @@ const AdminSettings = ({ room, onUpdate }) => {
       
       if (fileToUpload) {
         toast('Uploading room photo...', { icon: '⏳' })
-        const url = await uploadToCloudinary()
-        if (url) finalPicUrl = url
+        const uploadResult = await uploadToCloudinary()
+        if (uploadResult) {
+          finalPicUrl = uploadResult.url
+          var finalPublicId = uploadResult.publicId
+        }
       }
 
       const { data } = await API.put(`/rooms/${room._id}`, {
         name: name,
         roomPic: finalPicUrl,
+        roomPicPublicId: finalPublicId,
       })
 
       setRoomPic(data.room.roomPic)

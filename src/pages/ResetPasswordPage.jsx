@@ -87,7 +87,7 @@ const ResetPasswordPage = () => {
 
           <h2 className="text-xl font-bold text-white mb-2 text-center">Reset Password</h2>
           <p className="text-dark-400 text-sm mb-6 text-center">
-            Enter your new password below. Make sure it's at least 6 characters.
+            Enter your new password below. Make sure it's at least 8 characters and includes uppercase, lowercase, a number, and a special character.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
