@@ -140,7 +140,7 @@ const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRoo
 
           <button
             onClick={onOpenSidebar}
-            className="btn-primary mt-6 md:hidden"
+            className="btn-primary mt-6"
           >
             Open Sidebar
           </button>
