@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { Ghost, UserCircle, LogOut, Search, X, Users } from 'lucide-react'
+import { useSocket } from '../../context/SocketContext'
+import { formatLastActive, normalizePresenceId } from '../../utils/presence'
 
 const MembersPanel = ({ members, createdBy, isAdmin: viewerIsAdmin, onKick }) => {
   const [search, setSearch] = useState('')
+  const { onlineUsers, lastSeenByUser } = useSocket()
 
   const filteredMembers = members.filter(m => 
     m.username?.toLowerCase().includes(search.toLowerCase()) ||
@@ -47,6 +50,13 @@ const MembersPanel = ({ members, createdBy, isAdmin: viewerIsAdmin, onKick }) =>
           filteredMembers.map((member) => {
             const memberIsAdmin = member._id === createdBy
             const isDeleted = member.isDeleted
+            const memberId = normalizePresenceId(member._id)
+            const isOnline = !isDeleted && onlineUsers.has(memberId)
+            const presenceLabel = isDeleted
+              ? ''
+              : isOnline
+                ? 'Online'
+                : formatLastActive(lastSeenByUser[memberId] || member.lastActive)
             return (
               <div key={member._id} className="flex flex-col gap-3 p-3 bg-dark-800/40 rounded-xl border border-dark-700/30 hover:bg-dark-800/60 transition-colors">
                 <div className="flex items-center justify-between gap-3">
@@ -68,6 +78,14 @@ const MembersPanel = ({ members, createdBy, isAdmin: viewerIsAdmin, onKick }) =>
                       <p className="text-sm font-bold text-white truncate">
                         {isDeleted ? 'Deleted User' : member.username}
                       </p>
+                      {!isDeleted && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-dark-600'}`} />
+                          <span className="text-[10px] text-dark-500 truncate">
+                            {presenceLabel}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-1.5 mt-1">
                         {memberIsAdmin && (
                           <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-primary-500/10 text-primary-400 border border-primary-500/20 font-bold uppercase tracking-wider">

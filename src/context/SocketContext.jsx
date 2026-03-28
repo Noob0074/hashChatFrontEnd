@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { io } from 'socket.io-client'
 import { useAuth } from './AuthContext'
+import { normalizePresenceId } from '../utils/presence'
 
 const SocketContext = createContext(null)
 
@@ -14,6 +15,7 @@ export const SocketProvider = ({ children }) => {
   const { user } = useAuth()
   const [socket, setSocket] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState(new Set())
+  const [lastSeenByUser, setLastSeenByUser] = useState({})
   const socketRef = useRef(null)
 
   useEffect(() => {
@@ -24,6 +26,8 @@ export const SocketProvider = ({ children }) => {
         socketRef.current = null
         setSocket(null)
       }
+      setOnlineUsers(new Set())
+      setLastSeenByUser({})
       return
     }
 
@@ -51,16 +55,33 @@ export const SocketProvider = ({ children }) => {
     })
 
     // Track online users
-    newSocket.on('user_online', ({ userId }) => {
-      setOnlineUsers((prev) => new Set([...prev, userId]))
+    newSocket.on('presence_snapshot', ({ userIds = [] }) => {
+      setOnlineUsers(new Set(userIds.map((id) => normalizePresenceId(id))))
     })
 
-    newSocket.on('user_offline', ({ userId }) => {
-      setOnlineUsers((prev) => {
-        const next = new Set(prev)
-        next.delete(userId)
+    newSocket.on('user_online', ({ userId }) => {
+      const normalizedUserId = normalizePresenceId(userId)
+      setOnlineUsers((prev) => new Set([...prev, normalizedUserId]))
+      setLastSeenByUser((prev) => {
+        const next = { ...prev }
+        delete next[normalizedUserId]
         return next
       })
+    })
+
+    newSocket.on('user_offline', ({ userId, lastActive }) => {
+      const normalizedUserId = normalizePresenceId(userId)
+      setOnlineUsers((prev) => {
+        const next = new Set(prev)
+        next.delete(normalizedUserId)
+        return next
+      })
+      if (lastActive) {
+        setLastSeenByUser((prev) => ({
+          ...prev,
+          [normalizedUserId]: lastActive,
+        }))
+      }
     })
 
     socketRef.current = newSocket
@@ -69,6 +90,8 @@ export const SocketProvider = ({ children }) => {
     return () => {
       newSocket.disconnect()
       socketRef.current = null
+      setOnlineUsers(new Set())
+      setLastSeenByUser({})
     }
   }, [user])
 
@@ -101,6 +124,7 @@ export const SocketProvider = ({ children }) => {
       value={{
         socket,
         onlineUsers,
+        lastSeenByUser,
         joinRoom,
         leaveRoom,
         sendMessage,

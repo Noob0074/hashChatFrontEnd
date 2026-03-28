@@ -6,9 +6,11 @@ import TypingIndicator from './TypingIndicator'
 import { useSocket } from '../../context/SocketContext'
 import { useAuth } from '../../context/AuthContext'
 import API from '../../api/axios'
+import toast from 'react-hot-toast'
 import { Hash, Menu } from 'lucide-react'
 
 const AdminPanel = lazy(() => import('../Admin/AdminPanel'))
+const normalizeId = (value) => value?.toString?.() || value
 
 const ChatArea = ({
   room,
@@ -27,6 +29,15 @@ const ChatArea = ({
   const [typingUsers, setTypingUsers] = useState([])
   const [showRoomInfo, setShowRoomInfo] = useState(false)
   const [editingMessage, setEditingMessage] = useState(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchPerformed, setSearchPerformed] = useState(false)
+  const [searchHasMore, setSearchHasMore] = useState(false)
+  const [searchCursor, setSearchCursor] = useState(null)
+  const [activeSearchIndex, setActiveSearchIndex] = useState(-1)
+  const [activeSearchMessageId, setActiveSearchMessageId] = useState(null)
   const prevRoomRef = useRef(null)
 
   // Join/leave socket room when active room changes
@@ -47,6 +58,15 @@ const ChatArea = ({
     setShowRoomInfo(false)
     setTypingUsers([])
     setEditingMessage(null)
+    setSearchOpen(false)
+    setSearchQuery('')
+    setSearchResults([])
+    setSearchLoading(false)
+    setSearchPerformed(false)
+    setSearchHasMore(false)
+    setSearchCursor(null)
+    setActiveSearchIndex(-1)
+    setActiveSearchMessageId(null)
   }, [room?._id])
 
   const handleMessageUpdated = ({ messageId, content, type, isEdited, isDeleted }) => {
@@ -130,6 +150,129 @@ const ChatArea = ({
     }
   }
 
+  const jumpToSearchResult = async (result, index) => {
+    if (!room || !result?._id) return
+
+    const targetId = normalizeId(result._id)
+    setActiveSearchIndex(index)
+    setActiveSearchMessageId(targetId)
+
+    const alreadyLoaded = messages.some((message) => normalizeId(message._id) === targetId)
+    if (alreadyLoaded) {
+      return
+    }
+
+    try {
+      const { data } = await API.get(`/messages/${room._id}/context/${targetId}`)
+      setMessages(data.messages)
+      setHasMore(data.hasMoreBefore)
+      setCursor(data.cursor)
+      setActiveSearchMessageId(normalizeId(data.targetMessageId))
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to load message context')
+    }
+  }
+
+  const performSearch = async (cursorOverride = null, append = false) => {
+    if (!room) return
+
+    const trimmedQuery = searchQuery.trim()
+    if (!trimmedQuery) {
+      setSearchResults([])
+      setSearchPerformed(false)
+      setSearchHasMore(false)
+      setSearchCursor(null)
+      setActiveSearchIndex(-1)
+      setActiveSearchMessageId(null)
+      return
+    }
+
+    if (trimmedQuery.length < 1) {
+      toast.error('Search query is required')
+      return
+    }
+
+    setSearchLoading(true)
+    setSearchPerformed(true)
+    try {
+      let url = `/messages/${room._id}/search?q=${encodeURIComponent(trimmedQuery)}&limit=20`
+      if (cursorOverride) {
+        url += `&cursor=${encodeURIComponent(cursorOverride)}`
+      }
+
+      const { data } = await API.get(url)
+      const nextResults = append ? [...searchResults, ...data.results] : data.results
+
+      setSearchResults(nextResults)
+      setSearchHasMore(data.hasMore)
+      setSearchCursor(data.cursor)
+
+      if (!append) {
+        if (data.results.length > 0) {
+          jumpToSearchResult(data.results[0], 0)
+        } else {
+          setActiveSearchIndex(-1)
+          setActiveSearchMessageId(null)
+        }
+      }
+
+      return { results: nextResults, newlyLoadedResults: data.results }
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to search messages')
+    } finally {
+      setSearchLoading(false)
+    }
+  }
+
+  const handleSearchSubmit = (event) => {
+    event?.preventDefault?.()
+    performSearch()
+  }
+
+  const handleClearSearch = () => {
+    setSearchQuery('')
+    setSearchResults([])
+    setSearchPerformed(false)
+    setSearchHasMore(false)
+    setSearchCursor(null)
+    setActiveSearchIndex(-1)
+    setActiveSearchMessageId(null)
+  }
+
+  const toggleSearch = () => {
+    setSearchOpen((prev) => {
+      const next = !prev
+      if (!next) {
+        handleClearSearch()
+      }
+      return next
+    })
+  }
+
+  const handlePrevSearchResult = () => {
+    if (searchResults.length === 0) return
+    const nextIndex =
+      activeSearchIndex <= 0 ? searchResults.length - 1 : activeSearchIndex - 1
+    jumpToSearchResult(searchResults[nextIndex], nextIndex)
+  }
+
+  const handleNextSearchResult = () => {
+    if (searchResults.length === 0) return
+
+    if (activeSearchIndex >= searchResults.length - 1 && searchHasMore && !searchLoading) {
+      performSearch(searchCursor, true).then((data) => {
+        if (data?.newlyLoadedResults?.length) {
+          jumpToSearchResult(data.newlyLoadedResults[0], searchResults.length)
+        }
+      })
+      return
+    }
+
+    const nextIndex =
+      activeSearchIndex >= searchResults.length - 1 ? 0 : activeSearchIndex + 1
+    jumpToSearchResult(searchResults[nextIndex], nextIndex)
+  }
+
   // Empty state
   if (!room) {
     return (
@@ -171,6 +314,18 @@ const ChatArea = ({
         onToggleAdmin={() => setShowRoomInfo(!showRoomInfo)}
         onRoomLeft={onRoomLeft}
         onRoomDeleted={onRoomDeleted}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        onSearchSubmit={handleSearchSubmit}
+        onClearSearch={handleClearSearch}
+        searchOpen={searchOpen}
+        onToggleSearch={toggleSearch}
+        searchResultsCount={searchResults.length}
+        activeSearchIndex={activeSearchIndex >= 0 ? activeSearchIndex : 0}
+        onPrevSearchResult={handlePrevSearchResult}
+        onNextSearchResult={handleNextSearchResult}
+        searchLoading={searchLoading}
+        searchPerformed={searchPerformed}
       />
 
       <div className="flex-1 min-h-0 flex overflow-hidden">
@@ -184,6 +339,8 @@ const ChatArea = ({
             onEditMessage={setEditingMessage}
             onDeleteMessage={handleMessageDeleted}
             isAdmin={isAdmin}
+            searchQuery={searchQuery}
+            activeSearchMessageId={activeSearchMessageId}
           />
 
           <TypingIndicator users={typingUsers} />

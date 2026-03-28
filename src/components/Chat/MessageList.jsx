@@ -28,7 +28,19 @@ const formatDayLabel = (dateString) => {
   })
 }
 
-const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, onDeleteMessage, isAdmin }) => {
+const normalizeId = (value) => value?.toString?.() || value
+
+const MessageList = ({
+  messages,
+  loading,
+  hasMore,
+  onLoadMore,
+  onEditMessage,
+  onDeleteMessage,
+  isAdmin,
+  searchQuery,
+  activeSearchMessageId,
+}) => {
    const bottomRef = useRef(null)
    const containerRef = useRef(null)
    const prevLengthRef = useRef(0)
@@ -40,6 +52,15 @@ const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, on
      }
      prevLengthRef.current = messages.length
    }, [messages.length])
+
+   useEffect(() => {
+     if (!activeSearchMessageId || !containerRef.current) return
+
+     const target = containerRef.current.querySelector(
+       `[data-message-id="${CSS.escape(normalizeId(activeSearchMessageId))}"]`
+     )
+     target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+   }, [activeSearchMessageId, messages])
  
    return (
      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-1">
@@ -72,9 +93,11 @@ const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, on
        {messages.map((msg, index) => {
          const showDayDivider =
            index === 0 || getDayKey(messages[index - 1].createdAt) !== getDayKey(msg.createdAt)
+         const isActiveSearchResult =
+           normalizeId(msg._id) === normalizeId(activeSearchMessageId)
 
          return (
-           <div key={msg._id}>
+           <div key={msg._id} data-message-id={normalizeId(msg._id)}>
              {showDayDivider && (
                <div className="flex items-center justify-center py-3">
                  <div className="px-3 py-1 rounded-full bg-dark-800/80 border border-dark-700/60 text-[11px] font-medium text-dark-300">
@@ -87,6 +110,8 @@ const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, on
                onEdit={() => onEditMessage(msg)}
                onDelete={() => onDeleteMessage(msg._id)}
                isAdmin={isAdmin}
+               searchQuery={searchQuery}
+               isActiveSearchResult={isActiveSearchResult}
              />
            </div>
          )
