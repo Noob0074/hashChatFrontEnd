@@ -77,7 +77,11 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
   )
 
   const actionButton = (
-    <div className={`relative self-center w-8 flex-shrink-0 flex justify-center transition-opacity ${showActionsButton ? 'opacity-0 group-hover:opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <div
+      className={`absolute top-2 ${isMine ? '-left-10' : '-right-10'} z-10 flex justify-center transition-opacity ${
+        showActionsButton ? 'opacity-0 group-hover:opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+    >
       <button
         onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
         className="p-1.5 rounded-lg text-dark-600 hover:text-dark-300 hover:bg-dark-800 transition-all"
@@ -91,14 +95,9 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
   )
 
   return (
-    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start p-1 animate-slide-up group`}>
-      {isMine ? (
-        actionButton
-      ) : (
-        <div className="w-8 flex-shrink-0" />
-      )}
-
-      <div className={`max-w-[75%] md:max-w-[60%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start px-2 py-1 animate-slide-up`}>
+      <div className={`relative group max-w-[85%] md:max-w-[72%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+        {actionButton}
         {!isMine && (
           <p className="text-[11px] text-dark-500 mb-1 ml-3 font-medium">
             {senderName}
@@ -183,12 +182,6 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
           </p>
         </div>
       </div>
-
-      {!isMine ? (
-        actionButton
-      ) : (
-        <div className="w-8 flex-shrink-0" />
-      )}
 
       {showDeleteConfirm && (
         <ConfirmModal
