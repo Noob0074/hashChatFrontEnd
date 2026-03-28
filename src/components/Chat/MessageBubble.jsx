@@ -124,8 +124,8 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin, searchQuery, isActi
   )
 
   return (
-    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start px-1 sm:px-2 py-1 animate-slide-up`}>
-      <div className={`max-w-[92%] sm:max-w-[88%] md:max-w-[72%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start px-0.5 sm:px-2 py-1 animate-slide-up`}>
+      <div className={`max-w-[94%] sm:max-w-[88%] md:max-w-[72%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
         {!isMine && (
           <p className="text-[11px] text-dark-500 mb-1 ml-3 font-medium">
             {senderName}

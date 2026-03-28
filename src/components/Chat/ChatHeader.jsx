@@ -282,7 +282,7 @@ const ChatHeader = ({
       <div className="px-3 pb-2.5 sm:px-4 sm:pb-3">
         <form
           onSubmit={onSearchSubmit}
-          className="flex flex-wrap items-center gap-1.5 rounded-xl border border-dark-700/50 bg-dark-950/70 px-2.5 py-1.5 sm:flex-nowrap sm:gap-2 sm:rounded-2xl sm:px-3 sm:py-2"
+          className="flex flex-nowrap items-center gap-1 rounded-xl border border-dark-700/50 bg-dark-950/70 px-2 py-1.5 sm:gap-2 sm:rounded-2xl sm:px-3 sm:py-2"
         >
           <Search className="h-4 w-4 flex-shrink-0 text-dark-500" />
           <input
@@ -290,24 +290,24 @@ const ChatHeader = ({
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
             placeholder="Search this chat..."
-            className="min-w-0 flex-1 basis-[110px] bg-transparent text-[13px] text-white placeholder:text-dark-600 focus:outline-none sm:basis-[120px] sm:text-sm"
+            className="min-w-0 flex-1 bg-transparent text-[13px] text-white placeholder:text-dark-600 focus:outline-none sm:text-sm"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={onClearSearch}
-              className="rounded-md p-1 text-dark-500 transition-colors hover:bg-dark-800 hover:text-dark-200"
+              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md text-dark-500 transition-colors hover:bg-dark-800 hover:text-dark-200 sm:h-8 sm:w-8"
               title="Clear search"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <div className="flex w-full items-center justify-end gap-1.5 sm:w-auto sm:flex-shrink-0 sm:gap-2">
+          <div className="flex flex-shrink-0 items-center justify-end gap-1 sm:gap-1.5">
             <button
               type="button"
               onClick={onPrevSearchResult}
               disabled={!searchResultsCount || searchLoading}
-              className="rounded-md p-1 text-dark-500 transition-colors hover:bg-dark-800 hover:text-dark-200 disabled:opacity-40"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-dark-500 transition-colors hover:bg-dark-800 hover:text-dark-200 disabled:opacity-40 sm:h-8 sm:w-8"
               title="Previous result"
             >
               <ChevronUp className="w-4 h-4" />
@@ -316,25 +316,27 @@ const ChatHeader = ({
               type="button"
               onClick={onNextSearchResult}
               disabled={!searchResultsCount || searchLoading}
-              className="rounded-md p-1 text-dark-500 transition-colors hover:bg-dark-800 hover:text-dark-200 disabled:opacity-40"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-dark-500 transition-colors hover:bg-dark-800 hover:text-dark-200 disabled:opacity-40 sm:h-8 sm:w-8"
               title="Next result"
             >
               <ChevronDown className="w-4 h-4" />
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-primary-600 px-2.5 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-primary-500 disabled:opacity-40 sm:rounded-xl sm:px-3 sm:text-xs"
+              className="rounded-lg bg-primary-600 px-2 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-primary-500 disabled:opacity-40 sm:rounded-xl sm:px-3 sm:text-xs"
               disabled={searchLoading}
             >
-              {searchLoading ? '...' : 'Find'}
+              <span className="sm:hidden">{searchLoading ? '...' : 'Go'}</span>
+              <span className="hidden sm:inline">{searchLoading ? '...' : 'Find'}</span>
             </button>
             <button
               type="button"
               onClick={onToggleSearch}
-              className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-dark-400 transition-colors hover:bg-dark-800 hover:text-dark-100 sm:px-2.5 sm:text-xs"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-dark-400 transition-colors hover:bg-dark-800 hover:text-dark-100 sm:h-auto sm:w-auto sm:rounded-lg sm:px-2.5 sm:py-1.5 sm:text-xs"
               title="Close search"
             >
-              Close
+              <X className="h-4 w-4 sm:hidden" />
+              <span className="hidden sm:inline">Close</span>
             </button>
           </div>
         </form>
