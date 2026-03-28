@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from 'react'
+import { lazy, Suspense, useState, useEffect, useRef } from 'react'
 import ChatHeader from './ChatHeader'
 import MessageList from './MessageList'
 import ChatInput from './ChatInput'
 import TypingIndicator from './TypingIndicator'
-import AdminPanel from '../Admin/AdminPanel'
 import { useSocket } from '../../context/SocketContext'
 import { useAuth } from '../../context/AuthContext'
 import API from '../../api/axios'
 import { Hash, Menu } from 'lucide-react'
+
+const AdminPanel = lazy(() => import('../Admin/AdminPanel'))
 
 const ChatArea = ({
   room,
@@ -195,12 +196,20 @@ const ChatArea = ({
         </div>
 
         {showRoomInfo && room.type !== 'dm' && (
-          <AdminPanel
-            room={room}
-            onClose={() => setShowRoomInfo(false)}
-            onRefresh={onRefreshRooms}
-            isAdmin={isAdmin}
-          />
+          <Suspense
+            fallback={
+              <div className="hidden lg:flex w-80 flex-shrink-0 items-center justify-center border-l border-dark-700/50 bg-dark-900/40">
+                <div className="w-8 h-8 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
+              </div>
+            }
+          >
+            <AdminPanel
+              room={room}
+              onClose={() => setShowRoomInfo(false)}
+              onRefresh={onRefreshRooms}
+              isAdmin={isAdmin}
+            />
+          </Suspense>
         )}
       </div>
     </div>

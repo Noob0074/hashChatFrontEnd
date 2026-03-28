@@ -1,6 +1,6 @@
+import { memo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { Download, FileText, Image as ImageIcon, MoreVertical, Pencil, Trash2 } from 'lucide-react'
-import { useState } from 'react'
 import API from '../../api/axios'
 import toast from 'react-hot-toast'
 import ConfirmModal from '../Modals/ConfirmModal'
@@ -203,4 +203,4 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
   )
 }
 
-export default MessageBubble
+export default memo(MessageBubble)

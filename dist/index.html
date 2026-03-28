@@ -3,12 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <title>Hashchat - Anonymous Messaging</title>
-    <script type="module" crossorigin src="/assets/index-Du1JL0HL.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-dWb8_Pte.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <style>
+      :root {
+        --vh: 100vh;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #0f172a;
+      }
+      #root {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-DVJw2b7D.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-Dw2cE7zH.js">
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-Bxh5FR-R.js">
+    <link rel="modulepreload" crossorigin href="/assets/realtime-vendor-8CodhB19.js">
+    <link rel="modulepreload" crossorigin href="/assets/axios-F6svlCYL.js">
+    <link rel="modulepreload" crossorigin href="/assets/AuthContext-DuPgiUX9.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-BsR6SSWJ.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      const syncHeight = () => {
+        const vh = window.visualViewport ? `${window.visualViewport.height}px` : "100dvh";
+        document.documentElement.style.setProperty('--vh', vh);
+        if (window.visualViewport) {
+          window.scrollTo(0, 0);
+        }
+      };
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', syncHeight);
+        window.visualViewport.addEventListener('scroll', syncHeight);
+      }
+      window.addEventListener('resize', syncHeight);
+      syncHeight();
+    </script>
   </body>
 </html>
