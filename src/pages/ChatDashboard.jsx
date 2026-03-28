@@ -7,6 +7,8 @@ import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import VerificationOverlay from '../components/Auth/VerificationOverlay'
 
+const normalizeRoomId = (value) => value?.toString?.() || value
+
 const ChatDashboard = () => {
   const { user } = useAuth()
   const { socket } = useSocket()
@@ -14,101 +16,47 @@ const ChatDashboard = () => {
   const [activeRoom, setActiveRoom] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [loadingRooms, setLoadingRooms] = useState(true)
+  const [newMessageRoomIds, setNewMessageRoomIds] = useState([])
 
-  // Fetch rooms on mount
-  useEffect(() => {
-    fetchRooms()
-  }, [])
+  const updateRoomState = (roomId, updater) => {
+    const normalizedRoomId = normalizeRoomId(roomId)
 
-  // Listen for kick/ban events
-  useEffect(() => {
-    if (!socket) return
+    setRooms((prev) =>
+      prev.map((room) => (normalizeRoomId(room._id) === normalizedRoomId ? updater(room) : room))
+    )
 
-    const handleKicked = ({ roomId }) => {
-      toast.error('You were removed from the room')
-      if (activeRoom?._id === roomId) setActiveRoom(null)
-      fetchRooms()
-    }
+    setActiveRoom((prev) =>
+      normalizeRoomId(prev?._id) === normalizedRoomId ? updater(prev) : prev
+    )
+  }
 
-    const handleBanned = ({ roomId }) => {
-      toast.error('You are banned from this room')
-      if (activeRoom?._id === roomId) setActiveRoom(null)
-      fetchRooms()
-    }
+  const moveRoomToTop = (roomId, updater) => {
+    const normalizedRoomId = normalizeRoomId(roomId)
 
-    const handleNewDm = ({ room }) => {
-      setRooms((prev) => {
-        if (prev.find(r => r._id === room._id)) return prev;
-        toast('New Direct Message!', { icon: '💬' });
-        return [room, ...prev];
-      });
-    };
+    setRooms((prev) => {
+      const index = prev.findIndex((room) => normalizeRoomId(room._id) === normalizedRoomId)
+      if (index === -1) return prev
 
-    const handleNewRequest = () => {
-      toast.success('New join request for your room!');
-      fetchRooms();
-    };
+      const next = [...prev]
+      const [room] = next.splice(index, 1)
+      next.unshift(updater(room))
+      return next
+    })
 
-    const handleRequestApproved = ({ room }) => {
-      toast.success(`Your join request was approved!`);
-      fetchRooms(); // Better than manually adding, as it gets all data (lastMessage, etc)
-    };
-
-    const handleUserAction = () => {
-      fetchRooms()
-    };
-
-    const handleRoomDeletedEvent = ({ roomId }) => {
-      setRooms((prev) => prev.filter((r) => r._id !== roomId))
-      setActiveRoom((prev) => (prev?._id === roomId ? null : prev))
-    }
-
-    const handleUnbannedEvent = () => {
-      toast.success('You were unbanned from a room!')
-      fetchRooms()
-    }
-
-    const handleRoomUpdated = ({ room }) => {
-      setRooms((prev) => prev.map((r) => (r._id === room._id ? { ...r, ...room } : r)))
-      if (activeRoom?._id === room._id) {
-        setActiveRoom((prev) => ({ ...prev, ...room }))
-      }
-    }
-
-    socket.on('kicked', handleKicked)
-    socket.on('banned', handleBanned)
-    socket.on('unbanned', handleUnbannedEvent)
-    socket.on('new_dm', handleNewDm)
-    socket.on('new_request', handleNewRequest)
-    socket.on('request_approved', handleRequestApproved)
-    socket.on('user_kicked', handleUserAction)
-    socket.on('user_banned', handleUserAction)
-    socket.on('user_unbanned', handleUserAction)
-    socket.on('room_deleted', handleRoomDeletedEvent)
-    socket.on('room_updated', handleRoomUpdated)
-
-    return () => {
-      socket.off('kicked', handleKicked)
-      socket.off('banned', handleBanned)
-      socket.off('unbanned', handleUnbannedEvent)
-      socket.off('new_dm', handleNewDm)
-      socket.off('new_request', handleNewRequest)
-      socket.off('request_approved', handleRequestApproved)
-      socket.off('user_kicked', handleUserAction)
-      socket.off('user_banned', handleUserAction)
-      socket.off('user_unbanned', handleUserAction)
-      socket.off('room_deleted', handleRoomDeletedEvent)
-      socket.off('room_updated', handleRoomUpdated)
-    }
-  }, [socket, activeRoom])
+    setActiveRoom((prev) =>
+      normalizeRoomId(prev?._id) === normalizedRoomId ? updater(prev) : prev
+    )
+  }
 
   const fetchRooms = async () => {
     try {
       const { data } = await API.get('/rooms')
       setRooms(data.rooms)
       if (activeRoom) {
-        const updatedData = data.rooms.find(r => r._id === activeRoom._id)
-        if (updatedData) setActiveRoom(updatedData)
+        const updatedData = data.rooms.find(
+          (room) => normalizeRoomId(room._id) === normalizeRoomId(activeRoom._id)
+        )
+        setActiveRoom(updatedData || null)
       }
     } catch (err) {
       toast.error('Failed to load rooms')
@@ -117,9 +65,247 @@ const ChatDashboard = () => {
     }
   }
 
+  useEffect(() => {
+    fetchRooms()
+  }, [])
+
+  useEffect(() => {
+    if (!socket) return
+
+    const handleKicked = ({ roomId }) => {
+      const normalizedRoomId = normalizeRoomId(roomId)
+      toast.error('You were removed from the room')
+      setRooms((prev) => prev.filter((room) => normalizeRoomId(room._id) !== normalizedRoomId))
+      setNewMessageRoomIds((prev) => prev.filter((id) => id !== normalizedRoomId))
+      setActiveRoom((prev) => (normalizeRoomId(prev?._id) === normalizedRoomId ? null : prev))
+    }
+
+    const handleNewDm = ({ room }) => {
+      const normalizedRoomId = normalizeRoomId(room._id)
+
+      setRooms((prev) => {
+        if (prev.find((entry) => normalizeRoomId(entry._id) === normalizedRoomId)) return prev
+        toast('New Direct Message!', { icon: 'Ã°Å¸â€™Â¬' })
+        return [room, ...prev]
+      })
+
+      setNewMessageRoomIds((prev) =>
+        prev.includes(normalizedRoomId) ? prev : [...prev, normalizedRoomId]
+      )
+    }
+
+    const handleNewRequest = () => {
+      toast.success('New join request for your room!')
+      fetchRooms()
+    }
+
+    const handleRequestApproved = ({ room }) => {
+      const normalizedRoomId = normalizeRoomId(room._id)
+      toast.success('Your join request was approved!')
+      setRooms((prev) => {
+        const existing = prev.find((entry) => normalizeRoomId(entry._id) === normalizedRoomId)
+        if (existing) {
+          return prev.map((entry) =>
+            normalizeRoomId(entry._id) === normalizedRoomId ? { ...entry, ...room } : entry
+          )
+        }
+        return [room, ...prev]
+      })
+    }
+
+    const handleRoomMessage = (message) => {
+      const normalizedRoomId = normalizeRoomId(message.roomId)
+
+      moveRoomToTop(normalizedRoomId, (room) => ({
+        ...room,
+        lastMessage: message,
+      }))
+
+      const senderId = message.senderId?._id || message.senderId
+      const isIncoming = senderId?.toString() !== user?._id?.toString()
+      if (isIncoming && normalizedRoomId !== normalizeRoomId(activeRoom?._id)) {
+        setNewMessageRoomIds((prev) =>
+          prev.includes(normalizedRoomId) ? prev : [...prev, normalizedRoomId]
+        )
+
+        setRooms((prev) => {
+          const exists = prev.some((room) => normalizeRoomId(room._id) === normalizedRoomId)
+          if (!exists) {
+            fetchRooms()
+          }
+          return prev
+        })
+      }
+    }
+
+    const handleDmBlocked = ({ actorUserId, targetUserId }) => {
+      setRooms((prev) =>
+        prev.map((room) => {
+          if (room.type !== 'dm') return room
+          const hasActor = room.members?.some(
+            (member) => (member._id || member).toString() === actorUserId.toString()
+          )
+          const hasTarget = room.members?.some(
+            (member) => (member._id || member).toString() === targetUserId.toString()
+          )
+          if (!hasActor || !hasTarget) return room
+
+          return {
+            ...room,
+            members: room.members.map((member) => {
+              if ((member._id || member).toString() !== actorUserId.toString()) return member
+              const blockedUsers = member.blockedUsers || []
+              if (
+                blockedUsers.some(
+                  (entry) => (entry._id || entry).toString() === targetUserId.toString()
+                )
+              ) {
+                return member
+              }
+              return { ...member, blockedUsers: [...blockedUsers, targetUserId] }
+            }),
+          }
+        })
+      )
+
+      setActiveRoom((prev) => {
+        if (!prev || prev.type !== 'dm') return prev
+        const hasActor = prev.members?.some(
+          (member) => (member._id || member).toString() === actorUserId.toString()
+        )
+        const hasTarget = prev.members?.some(
+          (member) => (member._id || member).toString() === targetUserId.toString()
+        )
+        if (!hasActor || !hasTarget) return prev
+
+        return {
+          ...prev,
+          members: prev.members.map((member) => {
+            if ((member._id || member).toString() !== actorUserId.toString()) return member
+            const blockedUsers = member.blockedUsers || []
+            if (
+              blockedUsers.some(
+                (entry) => (entry._id || entry).toString() === targetUserId.toString()
+              )
+            ) {
+              return member
+            }
+            return { ...member, blockedUsers: [...blockedUsers, targetUserId] }
+          }),
+        }
+      })
+    }
+
+    const handleDmUnblocked = ({ actorUserId, targetUserId }) => {
+      const removeBlock = (room) => ({
+        ...room,
+        members: room.members.map((member) => {
+          if ((member._id || member).toString() !== actorUserId.toString()) return member
+          return {
+            ...member,
+            blockedUsers: (member.blockedUsers || []).filter(
+              (entry) => (entry._id || entry).toString() !== targetUserId.toString()
+            ),
+          }
+        }),
+      })
+
+      setRooms((prev) =>
+        prev.map((room) => {
+          if (room.type !== 'dm') return room
+          const hasActor = room.members?.some(
+            (member) => (member._id || member).toString() === actorUserId.toString()
+          )
+          const hasTarget = room.members?.some(
+            (member) => (member._id || member).toString() === targetUserId.toString()
+          )
+          return hasActor && hasTarget ? removeBlock(room) : room
+        })
+      )
+
+      setActiveRoom((prev) => {
+        if (!prev || prev.type !== 'dm') return prev
+        const hasActor = prev.members?.some(
+          (member) => (member._id || member).toString() === actorUserId.toString()
+        )
+        const hasTarget = prev.members?.some(
+          (member) => (member._id || member).toString() === targetUserId.toString()
+        )
+        return hasActor && hasTarget ? removeBlock(prev) : prev
+      })
+    }
+
+    const handleMessageUpdated = ({ messageId, content, type, isEdited, isDeleted }) => {
+      setRooms((prev) =>
+        prev.map((room) => {
+          if (room.lastMessage?._id !== messageId) return room
+          return {
+            ...room,
+            lastMessage: {
+              ...room.lastMessage,
+              content,
+              type,
+              isEdited,
+              isDeleted,
+            },
+          }
+        })
+      )
+    }
+
+    const handleUserKicked = ({ userId: targetUserId, roomId }) => {
+      updateRoomState(roomId, (room) => ({
+        ...room,
+        members:
+          room.members?.filter(
+            (member) => (member._id || member).toString() !== targetUserId.toString()
+          ) || [],
+        kickedUsers: [...(room.kickedUsers || []), targetUserId],
+      }))
+    }
+
+    const handleRoomDeletedEvent = ({ roomId }) => {
+      const normalizedRoomId = normalizeRoomId(roomId)
+      setRooms((prev) => prev.filter((room) => normalizeRoomId(room._id) !== normalizedRoomId))
+      setNewMessageRoomIds((prev) => prev.filter((id) => id !== normalizedRoomId))
+      setActiveRoom((prev) => (normalizeRoomId(prev?._id) === normalizedRoomId ? null : prev))
+    }
+
+    const handleRoomUpdated = ({ room }) => {
+      updateRoomState(room._id, (current) => ({ ...current, ...room }))
+    }
+
+    socket.on('kicked', handleKicked)
+    socket.on('new_dm', handleNewDm)
+    socket.on('new_request', handleNewRequest)
+    socket.on('request_approved', handleRequestApproved)
+    socket.on('room_message', handleRoomMessage)
+    socket.on('dm_blocked', handleDmBlocked)
+    socket.on('dm_unblocked', handleDmUnblocked)
+    socket.on('message_updated', handleMessageUpdated)
+    socket.on('user_kicked', handleUserKicked)
+    socket.on('room_deleted', handleRoomDeletedEvent)
+    socket.on('room_updated', handleRoomUpdated)
+
+    return () => {
+      socket.off('kicked', handleKicked)
+      socket.off('new_dm', handleNewDm)
+      socket.off('new_request', handleNewRequest)
+      socket.off('request_approved', handleRequestApproved)
+      socket.off('room_message', handleRoomMessage)
+      socket.off('dm_blocked', handleDmBlocked)
+      socket.off('dm_unblocked', handleDmUnblocked)
+      socket.off('message_updated', handleMessageUpdated)
+      socket.off('user_kicked', handleUserKicked)
+      socket.off('room_deleted', handleRoomDeletedEvent)
+      socket.off('room_updated', handleRoomUpdated)
+    }
+  }, [socket, activeRoom?._id, user?._id])
+
   const handleSelectRoom = (room) => {
+    const normalizedRoomId = normalizeRoomId(room._id)
     setActiveRoom(room)
-    // On mobile, close sidebar when room selected
+    setNewMessageRoomIds((prev) => prev.filter((id) => id !== normalizedRoomId))
     if (window.innerWidth < 768) {
       setSidebarOpen(false)
     }
@@ -131,8 +317,9 @@ const ChatDashboard = () => {
   }
 
   const handleRoomJoined = (room) => {
+    const normalizedRoomId = normalizeRoomId(room._id)
     setRooms((prev) => {
-      const exists = prev.find((r) => r._id === room._id)
+      const exists = prev.find((entry) => normalizeRoomId(entry._id) === normalizedRoomId)
       if (exists) return prev
       return [room, ...prev]
     })
@@ -140,13 +327,16 @@ const ChatDashboard = () => {
   }
 
   const handleRoomLeft = (roomId) => {
-    setRooms((prev) => prev.filter((r) => r._id !== roomId))
-    if (activeRoom?._id === roomId) setActiveRoom(null)
+    const normalizedRoomId = normalizeRoomId(roomId)
+    setRooms((prev) => prev.filter((room) => normalizeRoomId(room._id) !== normalizedRoomId))
+    setActiveRoom((prev) => (normalizeRoomId(prev?._id) === normalizedRoomId ? null : prev))
   }
 
   const handleRoomDeleted = (roomId) => {
-    setRooms((prev) => prev.filter((r) => r._id !== roomId))
-    if (activeRoom?._id === roomId) setActiveRoom(null)
+    const normalizedRoomId = normalizeRoomId(roomId)
+    setRooms((prev) => prev.filter((room) => normalizeRoomId(room._id) !== normalizedRoomId))
+    setNewMessageRoomIds((prev) => prev.filter((id) => id !== normalizedRoomId))
+    setActiveRoom((prev) => (normalizeRoomId(prev?._id) === normalizedRoomId ? null : prev))
   }
 
   if (user && !user.isGuest && !user.isVerified) {
@@ -155,10 +345,9 @@ const ChatDashboard = () => {
 
   return (
     <div className="flex-1 h-full w-full flex bg-dark-950 overflow-hidden relative">
-      {/* Sidebar */}
       <div
         className={`
-          ${sidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'}
+          ${sidebarOpen ? 'w-96 translate-x-0' : 'w-0 -translate-x-full'}
           transition-all duration-300 ease-in-out
           fixed md:relative z-30 h-full flex-shrink-0 overflow-hidden border-r border-dark-700/50 pt-[env(safe-area-inset-top)]
         `}
@@ -166,6 +355,7 @@ const ChatDashboard = () => {
         <Sidebar
           rooms={rooms}
           activeRoom={activeRoom}
+          newMessageRoomIds={newMessageRoomIds}
           loadingRooms={loadingRooms}
           onSelectRoom={handleSelectRoom}
           onRoomCreated={handleRoomCreated}
@@ -174,7 +364,6 @@ const ChatDashboard = () => {
         />
       </div>
 
-      {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-20 md:hidden"
@@ -185,7 +374,8 @@ const ChatDashboard = () => {
       <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <ChatArea
           room={activeRoom}
-          onOpenSidebar={() => setSidebarOpen(prev => !prev)}
+          sidebarOpen={sidebarOpen}
+          onOpenSidebar={() => setSidebarOpen((prev) => !prev)}
           onRoomLeft={handleRoomLeft}
           onRoomDeleted={handleRoomDeleted}
           onRefreshRooms={fetchRooms}

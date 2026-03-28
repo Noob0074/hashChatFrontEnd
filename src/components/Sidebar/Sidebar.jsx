@@ -10,6 +10,7 @@ import { X, Hash } from 'lucide-react'
 const Sidebar = ({
   rooms,
   activeRoom,
+  newMessageRoomIds,
   loadingRooms,
   onSelectRoom,
   onRoomCreated,
@@ -33,7 +34,8 @@ const Sidebar = ({
         </div>
         <button
           onClick={onCloseSidebar}
-          className="md:hidden p-1.5 rounded-lg hover:bg-dark-800 text-dark-400"
+          className="p-1.5 rounded-lg hover:bg-dark-800 text-dark-400"
+          aria-label="Close sidebar"
         >
           <X className="w-5 h-5" />
         </button>
@@ -52,12 +54,13 @@ const Sidebar = ({
       <SearchSection onRoomJoined={onRoomJoined} onSelectRoom={onSelectRoom} />
 
       {/* Rooms List */}
-      <RoomsList
-        rooms={rooms}
-        activeRoom={activeRoom}
-        loading={loadingRooms}
-        onSelectRoom={onSelectRoom}
-      />
+        <RoomsList
+          rooms={rooms}
+          activeRoom={activeRoom}
+          newMessageRoomIds={newMessageRoomIds}
+          loading={loadingRooms}
+          onSelectRoom={onSelectRoom}
+        />
 
       {/* Modals */}
       {showCreateModal && (

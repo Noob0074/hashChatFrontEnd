@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Ghost, UserCircle, LogOut, Ban, Search, X, Users } from 'lucide-react'
+import { Ghost, UserCircle, LogOut, Search, X, Users } from 'lucide-react'
 
-const MembersPanel = ({ members, bannedUsers, createdBy, isPublic, isAdmin: viewerIsAdmin, onKick, onBan, onUnban }) => {
+const MembersPanel = ({ members, createdBy, isAdmin: viewerIsAdmin, onKick }) => {
   const [search, setSearch] = useState('')
 
   const filteredMembers = members.filter(m => 
@@ -47,14 +47,18 @@ const MembersPanel = ({ members, bannedUsers, createdBy, isPublic, isAdmin: view
           filteredMembers.map((member) => {
             const memberIsAdmin = member._id === createdBy
             const isDeleted = member.isDeleted
-            const isBanned = bannedUsers?.some(b => (b._id || b).toString() === member._id.toString())
-
             return (
               <div key={member._id} className="flex flex-col gap-3 p-3 bg-dark-800/40 rounded-xl border border-dark-700/30 hover:bg-dark-800/60 transition-colors">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-dark-700 flex items-center justify-center flex-shrink-0 shadow-inner">
-                      {member.isGuest ? (
+                    <div className="w-10 h-10 rounded-full bg-dark-700 flex items-center justify-center flex-shrink-0 shadow-inner overflow-hidden">
+                      {member.profilePic && !isDeleted ? (
+                        <img
+                          src={member.profilePic}
+                          alt={member.username || 'Member'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : member.isGuest ? (
                         <Ghost className="w-5 h-5 text-dark-400" />
                       ) : (
                         <UserCircle className="w-5 h-5 text-dark-400" />
@@ -80,11 +84,6 @@ const MembersPanel = ({ members, bannedUsers, createdBy, isPublic, isAdmin: view
                             member
                           </span>
                         )}
-                        {isBanned && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-red-500/10 text-red-500 border border-red-500/20 font-bold uppercase tracking-wider">
-                            banned
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -93,34 +92,13 @@ const MembersPanel = ({ members, bannedUsers, createdBy, isPublic, isAdmin: view
                 {/* Admin Actions */}
                 {viewerIsAdmin && !memberIsAdmin && !isDeleted && (
                   <div className="flex gap-2 mt-1">
-                    {isBanned ? (
-                      <button
-                        onClick={() => onUnban(member._id)}
-                        className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-lg flex items-center justify-center gap-1 transition-colors"
-                      >
-                        <ShieldCheck className="w-3 h-3" />
-                        Unban
-                      </button>
-                    ) : (
-                      <>
-                        {!isPublic && (
-                          <button
-                            onClick={() => onKick(member._id)}
-                            className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg flex items-center justify-center gap-1 transition-colors"
-                          >
-                            <LogOut className="w-3 h-3" />
-                            Kick
-                          </button>
-                        )}
-                        <button
-                          onClick={() => onBan(member._id)}
-                          className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-lg flex items-center justify-center gap-1 transition-colors"
-                        >
-                          <Ban className="w-3 h-3" />
-                          Ban
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => onKick(member._id)}
+                      className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <LogOut className="w-3 h-3" />
+                      Kick
+                    </button>
                   </div>
                 )}
               </div>

@@ -2,10 +2,11 @@ import { Plus, DoorOpen } from 'lucide-react'
 
 const ActionsSection = ({ onCreateRoom, onJoinRoom }) => {
   return (
-    <div className="px-4 py-3 border-b border-dark-700/50 flex gap-2">
+    <div className="px-4 py-3 border-b border-dark-700/50">
+      <div className="grid grid-cols-2 gap-2">
       <button
         onClick={onCreateRoom}
-        className="flex-1 btn-primary text-sm py-2 flex items-center justify-center gap-1.5"
+        className="btn-primary text-sm py-3 flex items-center justify-center gap-2"
         id="create-room-btn"
       >
         <Plus className="w-4 h-4" />
@@ -13,12 +14,13 @@ const ActionsSection = ({ onCreateRoom, onJoinRoom }) => {
       </button>
       <button
         onClick={onJoinRoom}
-        className="flex-1 btn-secondary text-sm py-2 flex items-center justify-center gap-1.5"
+        className="btn-secondary text-sm py-3 flex items-center justify-center gap-2 text-center leading-tight"
         id="join-room-btn"
       >
         <DoorOpen className="w-4 h-4" />
-        Join Room
+        Join Private Room
       </button>
+      </div>
     </div>
   )
 }

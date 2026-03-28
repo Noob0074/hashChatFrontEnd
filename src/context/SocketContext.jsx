@@ -96,10 +96,6 @@ export const SocketProvider = ({ children }) => {
     socketRef.current?.emit('kick_user', { roomId, targetUserId })
   }
 
-  const banUser = (roomId, targetUserId) => {
-    socketRef.current?.emit('ban_user', { roomId, targetUserId })
-  }
-
   return (
     <SocketContext.Provider
       value={{
@@ -111,7 +107,6 @@ export const SocketProvider = ({ children }) => {
         startTyping,
         stopTyping,
         kickUser,
-        banUser,
       }}
     >
       {children}

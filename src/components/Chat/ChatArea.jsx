@@ -7,9 +7,16 @@ import AdminPanel from '../Admin/AdminPanel'
 import { useSocket } from '../../context/SocketContext'
 import { useAuth } from '../../context/AuthContext'
 import API from '../../api/axios'
-import { Hash } from 'lucide-react'
+import { Hash, Menu } from 'lucide-react'
 
-const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRooms }) => {
+const ChatArea = ({
+  room,
+  sidebarOpen,
+  onOpenSidebar,
+  onRoomLeft,
+  onRoomDeleted,
+  onRefreshRooms,
+}) => {
   const { socket, joinRoom, leaveRoom } = useSocket()
   const { user } = useAuth()
   const [messages, setMessages] = useState([])
@@ -125,7 +132,17 @@ const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRoo
   // Empty state
   if (!room) {
     return (
-      <div className="h-full flex flex-col items-center justify-center bg-dark-950">
+      <div className="relative h-full flex flex-col items-center justify-center bg-dark-950">
+        {!sidebarOpen && (
+          <button
+            onClick={onOpenSidebar}
+            className="absolute left-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-dark-700 bg-dark-900/90 text-dark-200 transition-colors hover:bg-dark-800 hover:text-white"
+            aria-label="Open sidebar"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+        )}
+
         <div className="text-center animate-fade-in">
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30 animate-glow">
@@ -137,19 +154,12 @@ const ChatArea = ({ room, onOpenSidebar, onRoomLeft, onRoomDeleted, onRefreshRoo
           <p className="text-dark-600 text-sm max-w-xs">
             Select a room from the sidebar or create a new one to start chatting
           </p>
-
-          <button
-            onClick={onOpenSidebar}
-            className="btn-primary mt-6"
-          >
-            Open Sidebar
-          </button>
         </div>
       </div>
     )
   }
 
-  const isAdmin = (room?.createdBy?._id || room?.createdBy) === user?._id
+  const isAdmin = room?.type !== 'dm' && (room?.createdBy?._id || room?.createdBy) === user?._id
 
   return (
     <div className="h-full flex flex-col bg-dark-950 overflow-hidden pt-[env(safe-area-inset-top)]">

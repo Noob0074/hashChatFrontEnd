@@ -76,32 +76,36 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
     </div>
   )
 
+  const actionButton = (
+    <div className={`relative self-center w-8 flex-shrink-0 flex justify-center transition-opacity ${showActionsButton ? 'opacity-0 group-hover:opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <button
+        onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
+        className="p-1.5 rounded-lg text-dark-600 hover:text-dark-300 hover:bg-dark-800 transition-all"
+        title={isMine ? 'Message Actions' : 'Moderate Message'}
+        disabled={!showActionsButton}
+      >
+        <MoreVertical className="w-4 h-4" />
+      </button>
+      {showActions && renderActionsMenu()}
+    </div>
+  )
+
   return (
-    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start gap-1 p-1 animate-slide-up group`}>
-      {/* Actions (Dots) - Show on left for mine */}
-      {(showActionsButton && isMine) && (
-        <div className="relative self-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <button 
-            onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
-            className="p-1.5 rounded-lg text-dark-600 hover:text-dark-300 hover:bg-dark-800 transition-all"
-            title="Message Actions"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-          {showActions && renderActionsMenu()}
-        </div>
+    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start p-1 animate-slide-up group`}>
+      {isMine ? (
+        actionButton
+      ) : (
+        <div className="w-8 flex-shrink-0" />
       )}
 
-      <div className={`max-w-[75%] md:max-w-[60%] flex flex-col w-fit ${isMine ? 'items-end' : 'items-start'} ${isMine ? 'self-end' : 'self-start'}`}>
-        {/* Sender name */}
+      <div className={`max-w-[75%] md:max-w-[60%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
         {!isMine && (
           <p className="text-[11px] text-dark-500 mb-1 ml-3 font-medium">
             {senderName}
           </p>
         )}
 
-        {/* Bubble */}
-        <div className={`px-4 py-2.5 w-fit rounded-2xl ${isMine ? 'msg-sent' : 'msg-received'} ${isDeleted ? 'opacity-70 !bg-dark-800 !text-white/80 italic border border-dark-700 font-medium' : ''}`}>
+        <div className={`px-4 py-2.5 w-fit max-w-full rounded-2xl ${isMine ? 'msg-sent' : 'msg-received'} ${isDeleted ? 'opacity-70 !bg-dark-800 !text-white/80 italic border border-dark-700 font-medium' : ''}`}>
           {isDeleted ? (
             <p className="text-sm flex items-center gap-2">
               <Trash2 className="w-3 h-3" />
@@ -168,7 +172,6 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
           )}
         </div>
 
-        {/* Timestamp & Edited status */}
         <div className={`flex items-center gap-2 mt-1 ${isMine ? 'justify-end mr-3' : 'justify-start ml-3'}`}>
           {message.isEdited && (
             <span className="text-[9px] text-dark-600 font-bold uppercase tracking-tighter italic">
@@ -181,21 +184,12 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin }) => {
         </div>
       </div>
 
-      {/* Actions (Dots) - Show on right for others (if admin) */}
-      {(showActionsButton && !isMine) && (
-        <div className="relative self-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <button 
-            onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
-            className="p-1.5 rounded-lg text-dark-600 hover:text-dark-300 hover:bg-dark-800 transition-all"
-            title="Moderate Message"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-          {showActions && renderActionsMenu()}
-        </div>
+      {!isMine ? (
+        actionButton
+      ) : (
+        <div className="w-8 flex-shrink-0" />
       )}
 
-      {/* Custom Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <ConfirmModal
           title="Delete Message?"

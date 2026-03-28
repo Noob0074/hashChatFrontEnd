@@ -51,6 +51,9 @@ const CreateRoomModal = ({ onClose, onCreated }) => {
               maxLength={50}
               required
             />
+            <p className="text-[10px] text-dark-500 mt-1 uppercase font-bold tracking-wider ml-1">
+              Alphabets, numbers, underscores, dots only
+            </p>
           </div>
 
           <div className="mb-6">

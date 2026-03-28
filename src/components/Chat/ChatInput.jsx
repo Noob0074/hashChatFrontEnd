@@ -212,18 +212,17 @@ const ChatInput = ({ room, editingMessage, setEditingMessage }) => {
   }
 
   const amIKicked = room?.kickedUsers?.some(u => (u._id || u).toString() === user?._id)
-  const amIBanned = room?.bannedUsers?.some(u => (u._id || u).toString() === user?._id)
-
   const renderDisabled = (message) => (
     <div className="border-t border-dark-700/50 bg-dark-900/60 backdrop-blur-xl p-4 flex justify-center text-dark-500 text-sm italic">
       {message}
     </div>
   )
 
-  if (amIBanned) return renderDisabled("You are banned from this room.")
-  if (amIKicked) return renderDisabled("You have been removed from this room.")
-  if (isDeletedUser) return renderDisabled("This user's account has been deleted.")
-  if (amIBlocked) return renderDisabled("You cannot message this user.")
+  const canOnlyEdit = editingMessage && amIBlocked
+
+  if (!editingMessage && amIKicked) return renderDisabled("You have been removed from this room.")
+  if (!editingMessage && isDeletedUser) return renderDisabled("This user's account has been deleted.")
+  if (!editingMessage && amIBlocked) return renderDisabled("You cannot message this user.")
 
   return (
     <div className={`border-t border-dark-700/50 bg-dark-900/60 backdrop-blur-xl p-4 transition-all ${editingMessage ? 'border-t-primary-500/50 bg-primary-500/5' : ''}`}>
@@ -269,6 +268,7 @@ const ChatInput = ({ room, editingMessage, setEditingMessage }) => {
         {/* File button */}
         <button
           onClick={() => fileRef.current?.click()}
+          disabled={canOnlyEdit}
           className="p-2.5 rounded-xl text-dark-500 hover:text-dark-200 hover:bg-dark-800 transition-colors flex-shrink-0"
           title="Attach file"
         >
@@ -288,7 +288,7 @@ const ChatInput = ({ room, editingMessage, setEditingMessage }) => {
             onChange={handleTyping}
             onKeyDown={handleKeyDown}
             className="input-field py-2.5 text-sm resize-none max-h-32 min-h-[44px] break-all no-scrollbar"
-            placeholder="Type a message..."
+            placeholder={canOnlyEdit ? "Edit your message..." : "Type a message..."}
             rows={1}
             id="message-input"
           />
@@ -297,7 +297,7 @@ const ChatInput = ({ room, editingMessage, setEditingMessage }) => {
         {/* Send button */}
         <button
           onClick={handleSend}
-          disabled={(!text.trim() && !file) || uploading}
+          disabled={(!text.trim() && !file) || uploading || (canOnlyEdit && !!file)}
           className="p-2.5 rounded-xl bg-primary-600 text-white hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20 disabled:opacity-40 flex-shrink-0"
           id="send-btn"
           title={editingMessage ? "Save changes" : "Send message"}

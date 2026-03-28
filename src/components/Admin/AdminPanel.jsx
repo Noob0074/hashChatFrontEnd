@@ -38,15 +38,10 @@ const AdminPanel = ({ room, onClose, onRefresh, isAdmin }) => {
     socket.on('new_request', handleRoomUpdateRequest)
     socket.on('room_updated', handleUpdate)
     socket.on('user_kicked', handleRoomUpdateRequest)
-    socket.on('user_banned', handleRoomUpdateRequest)
-    socket.on('user_unbanned', handleRoomUpdateRequest)
-
     return () => {
       socket.off('new_request', handleRoomUpdateRequest)
       socket.off('room_updated', handleUpdate)
       socket.off('user_kicked', handleRoomUpdateRequest)
-      socket.off('user_banned', handleRoomUpdateRequest)
-      socket.off('user_unbanned', handleRoomUpdateRequest)
     }
   }, [socket, room._id])
 
@@ -72,9 +67,7 @@ const AdminPanel = ({ room, onClose, onRefresh, isAdmin }) => {
           ? 'Request rejected'
           : action === 'kick'
           ? 'User kicked'
-          : action === 'unban'
-          ? 'User unbanned'
-          : 'User banned'
+          : 'User kicked'
       )
       await fetchRoomDetails()
       if (onRefresh) onRefresh()
@@ -246,13 +239,9 @@ const AdminPanel = ({ room, onClose, onRefresh, isAdmin }) => {
         ) : tab === 'members' ? (
           <MembersPanel
             members={roomData?.members || []}
-            bannedUsers={roomData?.bannedUsers || []}
             createdBy={roomData?.createdBy?._id || roomData?.createdBy}
-            isPublic={room.type === 'public'}
             isAdmin={isAdmin}
             onKick={(userId) => handleAction('kick', userId)}
-            onBan={(userId) => handleAction('ban', userId)}
-            onUnban={(userId) => handleAction('unban', userId)}
           />
         ) : tab === 'requests' ? (
           <JoinRequestsPanel

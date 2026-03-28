@@ -32,7 +32,7 @@ const JoinRoomModal = ({ onClose, onJoined }) => {
     }}>
       <div className="modal-content">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Join Room</h2>
+          <h2 className="text-xl font-bold text-white">Join Private Room</h2>
           <button onClick={onClose} className="text-dark-400 hover:text-white">
             <X className="w-5 h-5" />
           </button>
@@ -61,7 +61,7 @@ const JoinRoomModal = ({ onClose, onJoined }) => {
             disabled={loading || !roomId.trim()}
             className="btn-primary w-full"
           >
-            {loading ? 'Joining...' : 'Join Room'}
+            {loading ? 'Joining...' : 'Join Private Room'}
           </button>
         </form>
       </div>

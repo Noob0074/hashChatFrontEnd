@@ -2,6 +2,32 @@ import { useEffect, useRef } from 'react'
 import MessageBubble from './MessageBubble'
 import { ArrowUp } from 'lucide-react'
 
+const getDayKey = (dateString) => {
+  const date = new Date(dateString)
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+}
+
+const formatDayLabel = (dateString) => {
+  const date = new Date(dateString)
+  const today = new Date()
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+
+  if (getDayKey(dateString) === getDayKey(today)) {
+    return 'Today'
+  }
+
+  if (getDayKey(dateString) === getDayKey(yesterday)) {
+    return 'Yesterday'
+  }
+
+  return date.toLocaleDateString([], {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
 const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, onDeleteMessage, isAdmin }) => {
    const bottomRef = useRef(null)
    const containerRef = useRef(null)
@@ -43,15 +69,28 @@ const MessageList = ({ messages, loading, hasMore, onLoadMore, onEditMessage, on
          </div>
        )}
  
-       {messages.map((msg) => (
-         <MessageBubble 
-           key={msg._id} 
-           message={msg} 
-           onEdit={() => onEditMessage(msg)}
-           onDelete={() => onDeleteMessage(msg._id)}
-           isAdmin={isAdmin}
-         />
-       ))}
+       {messages.map((msg, index) => {
+         const showDayDivider =
+           index === 0 || getDayKey(messages[index - 1].createdAt) !== getDayKey(msg.createdAt)
+
+         return (
+           <div key={msg._id}>
+             {showDayDivider && (
+               <div className="flex items-center justify-center py-3">
+                 <div className="px-3 py-1 rounded-full bg-dark-800/80 border border-dark-700/60 text-[11px] font-medium text-dark-300">
+                   {formatDayLabel(msg.createdAt)}
+                 </div>
+               </div>
+             )}
+             <MessageBubble 
+               message={msg} 
+               onEdit={() => onEditMessage(msg)}
+               onDelete={() => onDeleteMessage(msg._id)}
+               isAdmin={isAdmin}
+             />
+           </div>
+         )
+       })}
 
       <div ref={bottomRef} />
     </div>

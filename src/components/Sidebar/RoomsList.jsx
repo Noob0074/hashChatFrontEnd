@@ -1,7 +1,7 @@
 import { Hash, Users, MessageSquare } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
-const RoomsList = ({ rooms, activeRoom, loading, onSelectRoom }) => {
+const RoomsList = ({ rooms, activeRoom, newMessageRoomIds, loading, onSelectRoom }) => {
   const { user } = useAuth()
 
   if (loading) {
@@ -31,6 +31,7 @@ const RoomsList = ({ rooms, activeRoom, loading, onSelectRoom }) => {
   const renderRoomItem = (room) => {
     const isActive = activeRoom?._id === room._id
     const isAdmin = room.type !== 'dm' && (room.createdBy?._id || room.createdBy) === user?._id
+    const hasNewMessage = newMessageRoomIds?.includes(room._id)
 
     // For DMs, show the other user's name
     let displayName = room.name
@@ -79,6 +80,9 @@ const RoomsList = ({ rooms, activeRoom, loading, onSelectRoom }) => {
             <span className="text-sm font-medium text-dark-200 truncate">
               {displayName}
             </span>
+            {hasNewMessage && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+            )}
             {room.type !== 'dm' && (
               <span className={`text-[9px] ${
                 room.type === 'public' ? 'badge-public' : 'badge-private'

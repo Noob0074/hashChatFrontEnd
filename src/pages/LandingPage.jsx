@@ -78,17 +78,17 @@ const LandingPage = () => {
           <FeatureCard 
             icon={<Shield className="w-6 h-6 text-emerald-400" />}
             title="Privacy First"
-            desc="No tracking, no data collection. Your privacy is our priority."
+            desc="Talk with less exposure. Jump in quickly without turning every chat into a profile."
           />
           <FeatureCard 
             icon={<Zap className="w-6 h-6 text-amber-400" />}
             title="Instant Sync"
-            desc="Real-time messaging with low latency for seamless conversations."
+            desc="Messages show up live, so conversations stay smooth, fast, and naturally in sync."
           />
           <FeatureCard 
             icon={<Lock className="w-6 h-6 text-primary-400" />}
             title="Secure Rooms"
-            desc="Control your rooms, password protect them, and enjoy private spaces."
+            desc="Create spaces your way with public rooms, private approvals, and one-to-one chats."
           />
         </div>
       </div>

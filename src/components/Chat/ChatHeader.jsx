@@ -50,11 +50,16 @@ const ChatHeader = ({ room, isAdmin, onOpenSidebar, onToggleAdmin, onRoomLeft, o
 
   const handleDelete = async () => {
     try {
-      await API.delete(`/rooms/${room._id}`)
-      toast.success('Room deleted')
+      if (room.type === 'dm') {
+        await API.put(`/rooms/${room._id}/hide`)
+        toast.success('Chat hidden')
+      } else {
+        await API.delete(`/rooms/${room._id}`)
+        toast.success('Room deleted')
+      }
       onRoomDeleted(room._id)
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to delete room')
+      toast.error(err.response?.data?.error || `Failed to ${room.type === 'dm' ? 'hide chat' : 'delete room'}`)
     }
   }
 
@@ -185,11 +190,15 @@ const ChatHeader = ({ room, isAdmin, onOpenSidebar, onToggleAdmin, onRoomLeft, o
 
       {showConfirmAction === 'delete' && (
         <ConfirmModal
-          title={`Delete ${room.type === 'dm' ? 'Chat' : 'Room'}`}
-          message="Are you sure? This action cannot be undone and all messages will be deleted."
+          title={room.type === 'dm' ? 'Hide Chat' : 'Delete Room'}
+          message={
+            room.type === 'dm'
+              ? 'Hide this chat from your list? It will come back if a new message arrives.'
+              : 'Are you sure? This action cannot be undone and all messages will be deleted.'
+          }
           onConfirm={handleDelete}
           onClose={() => setShowConfirmAction(null)}
-          danger={true}
+          danger={room.type !== 'dm'}
         />
       )}
 
