@@ -17,6 +17,7 @@ import {
   X,
   ChevronUp,
   ChevronDown,
+  MoreVertical,
 } from 'lucide-react'
 import ConfirmModal from '../Modals/ConfirmModal'
 import { useState } from 'react'
@@ -44,6 +45,7 @@ const ChatHeader = ({
   const { user, setUser } = useAuth()
   const { onlineUsers, lastSeenByUser } = useSocket()
   const [showConfirmAction, setShowConfirmAction] = useState(null) // null | 'leave' | 'delete' | 'block'
+  const [showDmMenu, setShowDmMenu] = useState(false)
 
 
   // For DM, show other user's name
@@ -101,6 +103,7 @@ const ChatHeader = ({
       const { data } = await API.post(`/users/block/${targetId}`)
       toast.success('User blocked')
       setUser(data.user) // Updates the blocked array in auth context
+      setShowDmMenu(false)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to block user')
     }
@@ -111,6 +114,7 @@ const ChatHeader = ({
       const { data } = await API.post(`/users/unblock/${targetId}`)
       toast.success('User unblocked')
       setUser(data.user)
+      setShowDmMenu(false)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to unblock user')
     }
@@ -164,17 +168,19 @@ const ChatHeader = ({
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button
-            onClick={onToggleSearch}
-            className={`p-2 rounded-lg transition-colors ${
-              searchOpen
-                ? 'text-primary-400 bg-primary-500/10'
-                : 'text-dark-500 hover:text-primary-400 hover:bg-primary-500/10'
-            }`}
-            title="Search in chat"
-          >
-            <Search className="w-4 h-4" />
-          </button>
+          {room.type !== 'dm' && (
+            <button
+              onClick={onToggleSearch}
+              className={`p-2 rounded-lg transition-colors ${
+                searchOpen
+                  ? 'text-primary-400 bg-primary-500/10'
+                  : 'text-dark-500 hover:text-primary-400 hover:bg-primary-500/10'
+              }`}
+              title="Search in chat"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          )}
 
           {room.type !== 'dm' && (
             <button
@@ -201,32 +207,73 @@ const ChatHeader = ({
           )}
 
           {room.type === 'dm' && (
-            <>
-              {isBlocked ? (
-                <button
-                  onClick={handleUnblock}
-                  className="p-2 rounded-lg text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
-                  title="Unblock User"
-                >
-                  <Shield className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowConfirmAction('block')}
-                  className="p-2 rounded-lg text-dark-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                  title="Block User"
-                >
-                  <Ban className="w-4 h-4" />
-                </button>
-              )}
+            <div className="relative">
               <button
-                onClick={() => setShowConfirmAction('delete')}
-                className="p-2 rounded-lg text-dark-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                title="Delete Chat"
+                onClick={() => setShowDmMenu((prev) => !prev)}
+                className={`p-2 rounded-lg transition-colors ${
+                  showDmMenu
+                    ? 'text-primary-400 bg-primary-500/10'
+                    : 'text-dark-500 hover:text-dark-200 hover:bg-dark-800'
+                }`}
+                title="Conversation options"
               >
-                <Trash2 className="w-4 h-4" />
+                <MoreVertical className="w-4 h-4" />
               </button>
-            </>
+
+              {showDmMenu && (
+                <>
+                  <button
+                    className="fixed inset-0 z-10 cursor-default"
+                    aria-label="Close menu"
+                    onClick={() => setShowDmMenu(false)}
+                  />
+                  <div className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-2xl border border-dark-700/60 bg-dark-900/95 shadow-2xl backdrop-blur-xl">
+                    <button
+                      onClick={() => {
+                        onToggleSearch()
+                        setShowDmMenu(false)
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-dark-100 transition-colors hover:bg-dark-800"
+                    >
+                      <Search className="w-4 h-4" />
+                      <span>{searchOpen ? 'Close Search' : 'Search Chat'}</span>
+                    </button>
+
+                    {isBlocked ? (
+                      <button
+                        onClick={handleUnblock}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-sm text-emerald-400 transition-colors hover:bg-emerald-500/10"
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span>Unblock User</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setShowConfirmAction('block')
+                          setShowDmMenu(false)
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-400 transition-colors hover:bg-red-500/10"
+                      >
+                        <Ban className="w-4 h-4" />
+                        <span>Block User</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setShowConfirmAction('delete')
+                        setShowDmMenu(false)
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-400 transition-colors hover:bg-red-500/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Hide Chat</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -235,7 +282,7 @@ const ChatHeader = ({
       <div className="px-4 pb-3">
         <form
           onSubmit={onSearchSubmit}
-          className="flex items-center gap-2 rounded-2xl border border-dark-700/50 bg-dark-950/70 px-3 py-2"
+          className="flex flex-wrap items-center gap-2 rounded-2xl border border-dark-700/50 bg-dark-950/70 px-3 py-2 sm:flex-nowrap"
         >
           <Search className="w-4 h-4 text-dark-500 flex-shrink-0" />
           <input
@@ -243,7 +290,7 @@ const ChatHeader = ({
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
             placeholder="Search this chat..."
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-dark-600 focus:outline-none"
+            className="min-w-0 flex-1 basis-[120px] bg-transparent text-sm text-white placeholder:text-dark-600 focus:outline-none"
           />
           {searchQuery && (
             <button
@@ -255,34 +302,36 @@ const ChatHeader = ({
               <X className="w-4 h-4" />
             </button>
           )}
-          <button
-            type="button"
-            onClick={onPrevSearchResult}
-            disabled={!searchResultsCount || searchLoading}
-            className="p-1 rounded-md text-dark-500 hover:text-dark-200 hover:bg-dark-800 disabled:opacity-40 transition-colors"
-            title="Previous result"
-          >
-            <ChevronUp className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={onNextSearchResult}
-            disabled={!searchResultsCount || searchLoading}
-            className="p-1 rounded-md text-dark-500 hover:text-dark-200 hover:bg-dark-800 disabled:opacity-40 transition-colors"
-            title="Next result"
-          >
-            <ChevronDown className="w-4 h-4" />
-          </button>
-          <button
-            type="submit"
-            className="px-3 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-xs font-bold text-white transition-colors disabled:opacity-40"
-            disabled={searchLoading}
-          >
-            {searchLoading ? '...' : 'Find'}
-          </button>
+          <div className="flex w-full items-center justify-end gap-2 sm:w-auto sm:flex-shrink-0">
+            <button
+              type="button"
+              onClick={onPrevSearchResult}
+              disabled={!searchResultsCount || searchLoading}
+              className="p-1 rounded-md text-dark-500 hover:text-dark-200 hover:bg-dark-800 disabled:opacity-40 transition-colors"
+              title="Previous result"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onNextSearchResult}
+              disabled={!searchResultsCount || searchLoading}
+              className="p-1 rounded-md text-dark-500 hover:text-dark-200 hover:bg-dark-800 disabled:opacity-40 transition-colors"
+              title="Next result"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            <button
+              type="submit"
+              className="px-3 py-1.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-xs font-bold text-white transition-colors disabled:opacity-40"
+              disabled={searchLoading}
+            >
+              {searchLoading ? '...' : 'Find'}
+            </button>
+          </div>
         </form>
 
-        <div className="mt-2 flex items-center justify-between text-[11px] text-dark-500">
+        <div className="mt-2 flex flex-col gap-1 text-[11px] text-dark-500 sm:flex-row sm:items-center sm:justify-between">
           <span>
             {searchQuery.trim()
               ? searchResultsCount

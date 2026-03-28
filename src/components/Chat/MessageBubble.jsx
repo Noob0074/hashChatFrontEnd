@@ -107,7 +107,7 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin, searchQuery, isActi
 
   const actionButton = (
     <div
-      className={`absolute top-2 ${isMine ? '-left-10' : '-right-10'} z-10 flex justify-center transition-opacity ${
+      className={`absolute top-2 ${isMine ? '-left-8 sm:-left-10' : '-right-8 sm:-right-10'} z-10 flex justify-center transition-opacity ${
         showActionsButton ? 'opacity-0 group-hover:opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
@@ -124,8 +124,8 @@ const MessageBubble = ({ message, onEdit, onDelete, isAdmin, searchQuery, isActi
   )
 
   return (
-    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start px-2 py-1 animate-slide-up`}>
-      <div className={`max-w-[85%] md:max-w-[72%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-start px-1 sm:px-2 py-1 animate-slide-up`}>
+      <div className={`max-w-[92%] sm:max-w-[88%] md:max-w-[72%] min-w-0 flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
         {!isMine && (
           <p className="text-[11px] text-dark-500 mb-1 ml-3 font-medium">
             {senderName}
