@@ -347,7 +347,7 @@ const ChatDashboard = () => {
     <div className="flex-1 h-full w-full flex bg-dark-950 overflow-hidden relative">
       <div
         className={`
-          ${sidebarOpen ? 'w-96 translate-x-0' : 'w-0 -translate-x-full'}
+          ${sidebarOpen ? 'w-[85vw] max-w-[20rem] translate-x-0 md:w-96 md:max-w-none' : 'w-0 -translate-x-full'}
           transition-all duration-300 ease-in-out
           fixed md:relative z-30 h-full flex-shrink-0 overflow-hidden border-r border-dark-700/50 pt-[env(safe-area-inset-top)]
         `}

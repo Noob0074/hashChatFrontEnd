@@ -23,18 +23,18 @@ const Sidebar = ({
   return (
     <div className="h-full flex flex-col bg-dark-900/95 backdrop-blur-xl border-r border-dark-700/50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-dark-700/50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-primary-500/20">
-            <Hash className="w-5 h-5 text-white" />
+      <div className="flex items-center justify-between px-3 py-3 sm:p-4 border-b border-dark-700/50">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-primary-500/20">
+            <Hash className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <h2 className="text-xl font-extrabold bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 bg-clip-text text-transparent tracking-tight">
+          <h2 className="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 bg-clip-text text-transparent tracking-tight truncate">
             Hashchat
           </h2>
         </div>
         <button
           onClick={onCloseSidebar}
-          className="p-1.5 rounded-lg hover:bg-dark-800 text-dark-400"
+          className="p-1.5 rounded-lg hover:bg-dark-800 text-dark-400 md:hidden"
           aria-label="Close sidebar"
         >
           <X className="w-5 h-5" />

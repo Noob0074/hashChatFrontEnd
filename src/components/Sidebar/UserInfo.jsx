@@ -11,19 +11,19 @@ const UserInfo = () => {
 
   return (
     <>
-      <div className="px-4 py-3 border-b border-dark-700/50">
-        <div className="flex items-center gap-3">
+      <div className="px-3 py-3 sm:px-4 border-b border-dark-700/50">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <div 
             onClick={() => setShowProfile(true)}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all overflow-hidden"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all overflow-hidden"
             title="Edit Profile"
           >
             {user.profilePic ? (
               <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
             ) : user.isGuest ? (
-              <Ghost className="w-5 h-5 text-white" />
+              <Ghost className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             ) : (
-              <UserCircle className="w-5 h-5 text-white" />
+              <UserCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             )}
           </div>
 
@@ -36,7 +36,7 @@ const UserInfo = () => {
                 {user.username}
               </p>
             </div>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex-shrink-0 ${
+            <span className={`text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex-shrink-0 ${
               user.isGuest 
                 ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
                 : 'bg-primary-500/10 text-primary-400 border border-primary-500/20'

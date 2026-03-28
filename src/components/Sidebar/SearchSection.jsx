@@ -58,7 +58,7 @@ const SearchSection = ({ onRoomJoined, onSelectRoom }) => {
   }
 
   return (
-    <div className="px-4 py-3 border-b border-dark-700/50">
+    <div className="px-3 py-3 sm:px-4 border-b border-dark-700/50">
       {/* Search tabs */}
       <div className="flex bg-dark-800/60 rounded-lg p-0.5 mb-2">
         <button
